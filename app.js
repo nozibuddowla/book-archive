@@ -7,18 +7,18 @@ const toggleSearchResult = displayStyle => {
     document.getElementById('search-result').style.display = displayStyle;
 }
 const toggleBookDetail = displayStyle => {
-    document.getElementById('book-details').style.display = displayStyle;
+    document.getElementById('book-detail').style.display = displayStyle;
 }
 // search
 const getBooks = () => {
     const searchField = document.getElementById('search-term');
+    const searchText = searchField.value;
 
     //display spinner
     toggleSpinner('block');
     toggleSearchResult('none');
     toggleBookDetail('none');
 
-    const searchText = searchField.value;
     searchField.value = '';
 
     document.getElementById('error-message').style.display = 'none';
@@ -29,10 +29,10 @@ const getBooks = () => {
 
     if (searchText === '') {
         const para = document.createElement('p');
-        para.innerText = `Please write something to display`;
+        para.innerText = `input field is blank`;
         para.style.color = 'red';
         para.style.textAlign = 'center';
-        emptyText.appendChild(p);
+        emptyText.appendChild(para);
         toggleSpinner('none');
     } else {
         const bookSearchUrl = `https://openlibrary.org/search.json?q=${searchText}`
@@ -64,17 +64,16 @@ const displayBooks = docs => {
         para.innerText = `No Books found`;
         para.style.color = 'red';
         para.style.textAlign = 'center';
-        noSearchResult.appendChild(p);
+        noSearchResult.appendChild(para);
         toggleBookDetail('none');
-        
+
     } else {
         const resultFound = document.getElementById('empty-text');
         resultFound.textContent = '';
         const para = document.createElement('p');
         para.innerText = `results Found ${docs.length}`;
-        para.style.color = 'black';
         para.style.textAlign = 'center';
-        resultFound.appendChild(p);
+        resultFound.appendChild(para);
         searchResult.textContent = '';
     }
     docs.forEach(doc => {
@@ -98,35 +97,29 @@ const displayBooks = docs => {
 }
 
 const loadBookDetail = bookTitle => {
-
-    const url = `https://openlibrary.org/search.json?q=${bookTitle}`;
-    fetch(url)
+    const bookDetailUrl = `https://openlibrary.org/search.json?q=${bookTitle}`;
+    fetch(bookDetailUrl)
         .then(res => res.json())
         .then(data => displayBookDetail(data.docs[0]))
-
 }
 
 const displayBookDetail = doc => {
-    //console.log(doc);
-    const bookDetails = document.getElementById('book-details');
-    bookDetails.textContent = '';
-    const div = document.createElement('div');
-    div.classList.add('modal-body');
-    div.innerHTML = `
-        <div class="container">
-            <div class="row">
-                <div class="col-md-4 ms-auto rounded">
-                    <img src="https://covers.openlibrary.org/b/id/${doc.cover_i ? doc.cover_i : ''}-M.jpg" alt="" class="img-fluid rounded">
-                    <h2 class="card-title">${doc.title}</h2>
-                    <h5>By ${doc.author_name ? doc.author_name : ''} </h5>
-                    <p>Publisher: ${doc.publisher ? doc.publisher : ''}</p>
-                    <p>First Publish in ${doc.first_publish_year ? doc.first_publish_year : ''}</p>
-                    <button class="btn btn-primary">Read Book</button>
-                </div>
+    const bookDetails = document.getElementById('book-detail');
+    bookDetails.textContent = ' ';
+    const bookDetailsDiv = document.createElement('div');
+    bookDetailsDiv.classList.add('card');
+    bookDetailsDiv.innerHTML = `
+        <div class="card rounded">
+            <div class="card-body">
+                <img src="https://covers.openlibrary.org/b/id/${doc.cover_i ? doc.cover_i : ''}-L.jpg" alt="" class="img-fluid rounded">
+                <h2 class="card-title">${doc.title}</h2>
+                <h5>By ${doc.author_name ? doc.author_name : ''} </h5>
+                <p>Publisher: ${doc.publisher ? doc.publisher : ''}</p>
+                <p>First Publish in ${doc.first_publish_year ? doc.first_publish_year : ''}</p>
+                <button class="btn btn-primary">Read Book</button>
             </div>
         </div>
     `;
-    bookDetails.appendChild(div);
+    bookDetails.appendChild(bookDetailsDiv);
     toggleBookDetail('block');
-
 }
